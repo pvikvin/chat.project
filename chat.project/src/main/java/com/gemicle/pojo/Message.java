@@ -1,36 +1,22 @@
 package com.gemicle.pojo;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+
+import lombok.Data;
+
+@Entity
+@Data
 public class Message {
+	
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private long id; 
+	
+	private long userIdFrom;
     private String from;
     private String to;
     private String content;
-
-    @Override
-    public String toString() {
-        return super.toString();
-    }
-
-    public String getFrom() {
-        return from;
-    }
-
-    public void setFrom(String from) {
-        this.from = from;
-    }
-
-    public String getTo() {
-        return to;
-    }
-
-    public void setTo(String to) {
-        this.to = to;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
 }

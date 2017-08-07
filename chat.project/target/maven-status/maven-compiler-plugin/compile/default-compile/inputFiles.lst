@@ -1,4 +1,12 @@
+D:\JavaEclipseProject\WebSocketChatExample\chat.project\src\main\java\com\gemicle\utils\MessageDecoder.java
 D:\JavaEclipseProject\WebSocketChatExample\chat.project\src\main\java\com\gemicle\websocket\ChatEndpoint.java
-D:\JavaEclipseProject\WebSocketChatExample\chat.project\src\main\java\com\gemicle\websocket\MessageDecoder.java
-D:\JavaEclipseProject\WebSocketChatExample\chat.project\src\main\java\com\gemicle\websocket\MessageEncoder.java
+D:\JavaEclipseProject\WebSocketChatExample\chat.project\src\main\java\com\gemicle\session\SessionFactoryBuild.java
+D:\JavaEclipseProject\WebSocketChatExample\chat.project\src\main\java\com\gemicle\managers\UserDb.java
+D:\JavaEclipseProject\WebSocketChatExample\chat.project\src\main\java\com\gemicle\service\UserService.java
+D:\JavaEclipseProject\WebSocketChatExample\chat.project\src\main\java\com\gemicle\utils\MessageEncoder.java
 D:\JavaEclipseProject\WebSocketChatExample\chat.project\src\main\java\com\gemicle\pojo\Message.java
+D:\JavaEclipseProject\WebSocketChatExample\chat.project\src\main\java\com\gemicle\session\SessionService.java
+D:\JavaEclipseProject\WebSocketChatExample\chat.project\src\main\java\com\gemicle\interfaces\ServiceHibernate.java
+D:\JavaEclipseProject\WebSocketChatExample\chat.project\src\main\java\com\gemicle\managers\UserManager.java
+D:\JavaEclipseProject\WebSocketChatExample\chat.project\src\main\java\com\gemicle\pojo\User.java
+D:\JavaEclipseProject\WebSocketChatExample\chat.project\src\main\java\com\gemicle\service\MessageService.java

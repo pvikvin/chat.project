@@ -1,4 +1,4 @@
-package com.gemicle.websocket;
+package com.gemicle.utils;
 
 import javax.websocket.EncodeException;
 import javax.websocket.Encoder;
