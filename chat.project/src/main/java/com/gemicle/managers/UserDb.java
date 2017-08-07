@@ -29,6 +29,7 @@ public class UserDb {
 			return;
 		}
 		userService.delete(user);
+		UserManager.delete(user);
 	}
 
 	public User getUserFromSessionId(String sessionId) {

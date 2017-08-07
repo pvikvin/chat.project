@@ -1,8 +1,6 @@
 package com.gemicle.websocket;
 
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.websocket.EncodeException;
@@ -15,12 +13,15 @@ import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 
 import com.gemicle.chatweb.constants.Constants;
-import com.gemicle.interfaces.HibernateService;
+import com.gemicle.chatweb.message.generator.MessageConnectGenerator;
+import com.gemicle.chatweb.message.generator.MessageDisconnectGenerator;
+import com.gemicle.chatweb.message.generator.MessageTextGenerator;
+import com.gemicle.chatweb.senders.MessageSender;
+import com.gemicle.interfaces.MessageGenerator;
 import com.gemicle.managers.UserDb;
 import com.gemicle.managers.UserManager;
 import com.gemicle.pojo.Message;
 import com.gemicle.pojo.User;
-import com.gemicle.service.MessageService;
 import com.gemicle.utils.MessageDecoder;
 import com.gemicle.utils.MessageEncoder;
 
@@ -28,10 +29,11 @@ import com.gemicle.utils.MessageEncoder;
 public class ChatEndpoint {
 
 	private Session session;
-	private static HibernateService<Message> messageService = new MessageService();
 	private UserDb userDb = new UserDb();
 	private static Logger log = Logger.getLogger(ChatEndpoint.class.getName());
 	private User user;
+	private MessageGenerator messageGenerator;
+	private MessageSender sender = new MessageSender();
 
 	public ChatEndpoint() {
 		log.info("Create ChatEndpoint");
@@ -40,44 +42,28 @@ public class ChatEndpoint {
 	@OnOpen
 	public void onOpen(Session session, @PathParam("username") String username) throws IOException, EncodeException {
 		log.info("Open websoket");
-
 		this.session = session;
 		Constants.CHAT_END_POINTS.add(this);
-
 		user = userDb.save(session.getId(), username);
-
 		log.info("users: " + UserManager.getUsers());
-
-		Message message = new Message();
-		message.setFromUser(username);
-		message.setContent("Connected!");
-		message.setUserIdFrom(user.getId());
-		message.setToUser("All users");
-		broadcast(message);
+		messageGenerator = new MessageConnectGenerator(user);
+		sender.sendMessage(messageGenerator);
 	}
 
 	@OnMessage
 	public void onMessage(Session session, Message message) throws IOException, EncodeException {
-		log.info("onMessage");
-		
-		message.setFromUser(userDb.getUserFromSessionId(session.getId()).getLogin());
-		message.setUserIdFrom(userDb.getUserFromSessionId(session.getId()).getId());
-		broadcast(message);
+		log.info("onMessage: " + message.toString());
+		messageGenerator = new MessageTextGenerator(user, message);
+		sender.sendMessage(messageGenerator);
 	}
 
 	@OnClose
 	public void onClose(Session session) throws IOException, EncodeException {
 		Constants.CHAT_END_POINTS.remove(this);
-
 		user = userDb.getUserFromSessionId(session.getId());
-		
-		Message message = new Message();
-		message.setFromUser(user.getLogin());
-		message.setContent("Disconnected!");
-		message.setUserIdFrom(user.getId());
-		
-		userDb.delete(session.getId());
-		broadcast(message);
+		messageGenerator = new MessageDisconnectGenerator(user);
+		sender.sendMessage(messageGenerator);
+		userDb.delete(session.getId());	
 	}
 
 	@OnError
@@ -85,18 +71,8 @@ public class ChatEndpoint {
 		// Do error handling here
 	}
 
-	private static void broadcast(Message message) throws IOException, EncodeException {
-		
-		messageService.save(message);
-		
-		Constants.CHAT_END_POINTS.forEach(endpoint -> {
-			synchronized (endpoint) {
-				try {
-					endpoint.session.getBasicRemote().sendObject(message);
-				} catch (IOException | EncodeException e) {
-					e.printStackTrace();
-				}
-			}
-		});
+	public Session getSession() {
+		return session;
 	}
+
 }
