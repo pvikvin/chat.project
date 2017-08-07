@@ -5,11 +5,11 @@ import java.util.List;
 import org.hibernate.Query;
 import org.hibernate.classic.Session;
 
-import com.gemicle.interfaces.ServiceHibernate;
+import com.gemicle.interfaces.HibernateService;
 import com.gemicle.pojo.User;
 import com.gemicle.session.SessionService;
 
-public class UserService implements ServiceHibernate<User> {
+public class UserService implements HibernateService<User> {
 
 	private SessionService hibernateService = new SessionService();
 
@@ -39,9 +39,9 @@ public class UserService implements ServiceHibernate<User> {
 	@Override
 	public List<User> getList() {
 		Session session = hibernateService.openSession();
-		Query query = session.createQuery("FROM user");
-		List users = query.list();
-		return users;
+		Query query = session.createQuery("FROM User");
+		List result = query.list();
+		return result;
 	}
 
 }

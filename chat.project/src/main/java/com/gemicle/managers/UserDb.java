@@ -3,13 +3,13 @@ package com.gemicle.managers;
 import java.util.Date;
 import java.util.List;
 
-import com.gemicle.interfaces.ServiceHibernate;
+import com.gemicle.interfaces.HibernateService;
 import com.gemicle.pojo.User;
 import com.gemicle.service.UserService;
 
 public class UserDb {
 
-	private static ServiceHibernate<User> userService = new UserService();
+	private static HibernateService<User> userService = new UserService();
 
 	public User save(String sessionId, String username) {
 		User user = new User();

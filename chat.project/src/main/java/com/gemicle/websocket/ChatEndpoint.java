@@ -14,10 +14,12 @@ import javax.websocket.Session;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 
-import com.gemicle.interfaces.ServiceHibernate;
+import com.gemicle.chatweb.constants.Constants;
+import com.gemicle.interfaces.HibernateService;
 import com.gemicle.managers.UserDb;
 import com.gemicle.managers.UserManager;
 import com.gemicle.pojo.Message;
+import com.gemicle.pojo.User;
 import com.gemicle.service.MessageService;
 import com.gemicle.utils.MessageDecoder;
 import com.gemicle.utils.MessageEncoder;
@@ -26,10 +28,10 @@ import com.gemicle.utils.MessageEncoder;
 public class ChatEndpoint {
 
 	private Session session;
-	private static final Set<ChatEndpoint> CHAT_END_POINTS = new HashSet<ChatEndpoint>();
-	private static ServiceHibernate<Message> messageService = new MessageService();
+	private static HibernateService<Message> messageService = new MessageService();
 	private UserDb userDb = new UserDb();
 	private static Logger log = Logger.getLogger(ChatEndpoint.class.getName());
+	private User user;
 
 	public ChatEndpoint() {
 		log.info("Create ChatEndpoint");
@@ -40,16 +42,17 @@ public class ChatEndpoint {
 		log.info("Open websoket");
 
 		this.session = session;
-		CHAT_END_POINTS.add(this);
+		Constants.CHAT_END_POINTS.add(this);
 
-		userDb.save(session.getId(), username);
+		user = userDb.save(session.getId(), username);
 
 		log.info("users: " + UserManager.getUsers());
 
 		Message message = new Message();
-		message.setFrom(username);
+		message.setFromUser(username);
 		message.setContent("Connected!");
-		message.setUserIdFrom(userDb.getUserFromSessionId(session.getId()).getId());
+		message.setUserIdFrom(user.getId());
+		message.setToUser("All users");
 		broadcast(message);
 	}
 
@@ -57,21 +60,23 @@ public class ChatEndpoint {
 	public void onMessage(Session session, Message message) throws IOException, EncodeException {
 		log.info("onMessage");
 		
-		message.setFrom(userDb.getUserFromSessionId(session.getId()).getLogin());
+		message.setFromUser(userDb.getUserFromSessionId(session.getId()).getLogin());
 		message.setUserIdFrom(userDb.getUserFromSessionId(session.getId()).getId());
 		broadcast(message);
 	}
 
 	@OnClose
 	public void onClose(Session session) throws IOException, EncodeException {
-		CHAT_END_POINTS.remove(this);
+		Constants.CHAT_END_POINTS.remove(this);
 
-		userDb.delete(session.getId());
-
+		user = userDb.getUserFromSessionId(session.getId());
+		
 		Message message = new Message();
-		message.setFrom(userDb.getUserFromSessionId(session.getId()).getLogin());
+		message.setFromUser(user.getLogin());
 		message.setContent("Disconnected!");
-		message.setUserIdFrom(userDb.getUserFromSessionId(session.getId()).getId());		
+		message.setUserIdFrom(user.getId());
+		
+		userDb.delete(session.getId());
 		broadcast(message);
 	}
 
@@ -84,7 +89,7 @@ public class ChatEndpoint {
 		
 		messageService.save(message);
 		
-		CHAT_END_POINTS.forEach(endpoint -> {
+		Constants.CHAT_END_POINTS.forEach(endpoint -> {
 			synchronized (endpoint) {
 				try {
 					endpoint.session.getBasicRemote().sendObject(message);

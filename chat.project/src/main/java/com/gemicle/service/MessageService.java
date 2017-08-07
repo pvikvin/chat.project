@@ -5,11 +5,11 @@ import java.util.List;
 import org.hibernate.Query;
 import org.hibernate.classic.Session;
 
-import com.gemicle.interfaces.ServiceHibernate;
+import com.gemicle.interfaces.HibernateService;
 import com.gemicle.pojo.Message;
 import com.gemicle.session.SessionService;
 
-public class MessageService implements ServiceHibernate<Message> {
+public class MessageService implements HibernateService<Message> {
 
 	private SessionService hibernateService = new SessionService();
 
@@ -39,8 +39,9 @@ public class MessageService implements ServiceHibernate<Message> {
 	@Override
 	public List<Message> getList() {
 		Session session = hibernateService.openSession();
-		Query query = session.createQuery("FROM message");
+		Query query = session.createQuery("FROM Message");
 		List messages = query.list();
+		hibernateService.commitAndCloseSession(session);
 		return messages;
 	}
 

@@ -16,7 +16,10 @@ public class Message {
 	private long id; 
 	
 	private long userIdFrom;
-    private String from;
-    private String to;
+	
+	private String fromUser;
+    private String toUser;
     private String content;
+    
+    public Message(){}
 }
